@@ -1,0 +1,6 @@
+# Handle all text files
+* text=auto
+
+# Handle specific file types
+*.c text eol=lf
+*.h text eol=lf
