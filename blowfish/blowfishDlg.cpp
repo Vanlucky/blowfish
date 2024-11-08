@@ -86,6 +86,8 @@ BEGIN_MESSAGE_MAP(CblowfishDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_ENC, &CblowfishDlg::OnBnClickedBtnEnc)
 	ON_BN_CLICKED(IDC_BTN_DEC, &CblowfishDlg::OnBnClickedBtnDec)
 	ON_BN_CLICKED(IDC_BTN_RANKEY, &CblowfishDlg::OnBnClickedBtnRankey)
+	ON_BN_CLICKED(IDC_BTN_CLEAR, &CblowfishDlg::OnBnClickedBtnClear)
+	ON_WM_CTLCOLOR()
 END_MESSAGE_MAP()
 
 
@@ -120,9 +122,13 @@ BOOL CblowfishDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// 设置大图标
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
-	// TODO: 在此添加额外的初始化代码
+
 	srand((unsigned int)time(NULL));
 
+	CBitmap bitmap;
+	bitmap.LoadBitmap(IDB_BMP_MATRIX);   //这个IDB_BITMAP1要自己添加
+	m_brush.CreatePatternBrush(&bitmap);
+	
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -319,10 +325,7 @@ void CblowfishDlg::fileenc()
 	// 获取char* 类型的文件内容
 	int len = file.GetLength();
 	int lenhex = len + ((len % 16 != 0) ? (16 - len % 16) : 0);
-	//if (len % 16 != 0)
-	//	lenhex = len + (16 - len % 16);
-	//else
-	//	lenhex = len;
+
 	char* ftext = (char*)malloc(lenhex * sizeof(char));
 	memset(ftext, 0, lenhex);
 	file.Read(ftext, len);
@@ -403,10 +406,10 @@ void CblowfishDlg::getKeyCstrtoChar(char*& key, const int& len)
 	//char* utext;
 	key = (char*)malloc(len1 * sizeof(char));
 	wcstombs_s(&converted1, key, len1, wChar1, _TRUNCATE);
-	CString strKey;
-	strKey = key;
-	strKey.Format(_T("%s %d"), strKey, len);
-	MessageBox(strKey);
+	//CString strKey;
+	//strKey = key;
+	//strKey.Format(_T("%s %d"), strKey, len);
+	//MessageBox(strKey);
 }
 
 void CblowfishDlg::getTextCstrtoChar(char*& text, int& len, CString& strText)
@@ -414,7 +417,6 @@ void CblowfishDlg::getTextCstrtoChar(char*& text, int& len, CString& strText)
 	int strlen = 2 * strText.GetLength();
 	len = strlen + ((strlen % 16 != 0) ? (16 - strlen % 16) : 0);
 	wchar_t* wChar = strText.GetBuffer(strlen);
-	//wchar_t* wChar = L"1234567";
 	strText.ReleaseBuffer();
 	// 将得到的wchar* 类型转为 char*类型
 	text = (char*)malloc(len * sizeof(char));
@@ -429,6 +431,7 @@ void CblowfishDlg::getTextCstrtoChar(char*& text, int& len, CString& strText)
 
 void CblowfishDlg::OnBnClickedBtnRankey()
 {
+	UpdateData(true);
 	CString strKey;
 	for (int i = 0; i < 16; i++)
 	{
@@ -437,4 +440,37 @@ void CblowfishDlg::OnBnClickedBtnRankey()
 	}
 	m_strkey = strKey;
 	UpdateData(false);
+}
+
+
+void CblowfishDlg::OnBnClickedBtnClear()
+{
+	UpdateData(true);
+	//m_strkey.Empty();
+	m_strming.Empty();
+	m_strmi.Empty();
+	UpdateData(false);
+}
+
+
+HBRUSH CblowfishDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
+{
+	HBRUSH hbr = CDialogEx::OnCtlColor(pDC, pWnd, nCtlColor);
+	
+	// TODO:  在此更改 DC 的任何特性
+	//UINT id = pWnd->GetDlgCtrlID();
+	if (pWnd == this)
+	{
+		return m_brush;
+	}
+	else if (nCtlColor == CTLCOLOR_STATIC)
+	{
+		pDC->SetTextColor(RGB(0, 0, 255));
+		//pDC->SetBkMode(TRANSPARENT);
+		//return (HBRUSH)::GetStockObject(NULL_BRUSH);
+	}
+
+
+	// TODO:  如果默认的不是所需画笔，则返回另一个画笔
+	return hbr;
 }

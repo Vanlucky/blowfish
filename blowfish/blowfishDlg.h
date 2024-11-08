@@ -45,7 +45,7 @@ public:
 	afx_msg void OnBnClickedBtnDec();
 
 	INT m_bfile;
-
+	CBrush m_brush;
 
 private:
 	void fileenc();
@@ -55,4 +55,6 @@ private:
 
 public:
 	afx_msg void OnBnClickedBtnRankey();
+	afx_msg void OnBnClickedBtnClear();
+	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 };
